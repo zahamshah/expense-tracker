@@ -33,3 +33,5 @@ coverage
 .turbo
 .vitest
 *.tsbuildinfo
+
+.vercel

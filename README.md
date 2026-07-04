@@ -9,6 +9,8 @@ Production-ready internal expense tracker for a small WhatNot warehouse business
 - Expense CRUD with date, amount in GBP, category, description, partner paid by, receipt upload, and notes.
 - Search, filters, sorting, pagination, edit, and delete in the expense table.
 - Partner reconciliation for 60% / 20% / 20% ownership with net settlement suggestions.
+- Manual settlement checkpoints that reset reconciliation from the current moment.
+- Salary and Business Account expenses still appear in expenses/reporting but are excluded from reconciliation.
 - Server-generated CSV, Excel, and PDF exports.
 - Responsive UI with dark mode support.
 

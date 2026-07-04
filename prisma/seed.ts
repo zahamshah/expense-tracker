@@ -22,12 +22,14 @@ async function main() {
         name: category.name,
         color: category.color,
         sortOrder: index + 1,
+        excludeFromReconciliation: category.excludeFromReconciliation,
       },
       create: {
         name: category.name,
         slug: category.slug,
         color: category.color,
         sortOrder: index + 1,
+        excludeFromReconciliation: category.excludeFromReconciliation,
       },
     });
   }

@@ -87,3 +87,10 @@ export type Settlement = {
   toPartnerName: string;
   amountPence: number;
 };
+
+export type ReconciliationCheckpointInfo = {
+  id: string;
+  settledAt: string;
+  settledTotalPence: number;
+  note: string | null;
+} | null;

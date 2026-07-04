@@ -21,7 +21,21 @@ export async function getDashboardData() {
 }
 
 export async function getReconciliationData() {
-  const [partners, expenseTotals] = await Promise.all([
+  const latestCheckpoint = await prisma.reconciliationCheckpoint.findFirst({
+    orderBy: { settledAt: "desc" },
+  });
+  const reconciliationWhere = {
+    ...(latestCheckpoint ? { createdAt: { gt: latestCheckpoint.settledAt } } : {}),
+    paidBy: {
+      ownershipBps: {
+        gt: 0,
+      },
+    },
+    category: {
+      excludeFromReconciliation: false,
+    },
+  };
+  const [partners, expenseTotals, excludedTotal] = await Promise.all([
     prisma.partner.findMany({
       where: {
         ownershipBps: {
@@ -37,6 +51,27 @@ export async function getReconciliationData() {
     }),
     prisma.expense.groupBy({
       by: ["paidById"],
+      where: reconciliationWhere,
+      _sum: {
+        amountPence: true,
+      },
+    }),
+    prisma.expense.aggregate({
+      where: {
+        ...(latestCheckpoint ? { createdAt: { gt: latestCheckpoint.settledAt } } : {}),
+        OR: [
+          {
+            paidBy: {
+              ownershipBps: 0,
+            },
+          },
+          {
+            category: {
+              excludeFromReconciliation: true,
+            },
+          },
+        ],
+      },
       _sum: {
         amountPence: true,
       },
@@ -59,6 +94,15 @@ export async function getReconciliationData() {
 
   return {
     totalExpensePence,
+    excludedExpensePence: excludedTotal._sum.amountPence ?? 0,
+    latestCheckpoint: latestCheckpoint
+      ? {
+          id: latestCheckpoint.id,
+          settledAt: latestCheckpoint.settledAt.toISOString(),
+          settledTotalPence: latestCheckpoint.settledTotalPence,
+          note: latestCheckpoint.note,
+        }
+      : null,
     ...calculateReconciliation(partnerInputs, totalExpensePence),
   };
 }

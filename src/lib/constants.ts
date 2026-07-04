@@ -6,20 +6,26 @@ export const PARTNERS = [
 ] as const;
 
 export const CATEGORIES = [
-  { name: "Inventory", slug: "inventory", color: "#2563eb" },
-  { name: "Warehouse Rent", slug: "warehouse-rent", color: "#7c3aed" },
-  { name: "Utilities", slug: "utilities", color: "#0891b2" },
-  { name: "Packaging", slug: "packaging", color: "#059669" },
-  { name: "Shipping", slug: "shipping", color: "#dc2626" },
-  { name: "Fuel", slug: "fuel", color: "#ea580c" },
-  { name: "Marketing", slug: "marketing", color: "#db2777" },
-  { name: "Equipment", slug: "equipment", color: "#475569" },
-  { name: "Repairs", slug: "repairs", color: "#ca8a04" },
-  { name: "Software", slug: "software", color: "#4f46e5" },
-  { name: "Office", slug: "office", color: "#0d9488" },
-  { name: "Food", slug: "food", color: "#16a34a" },
-  { name: "Returns", slug: "returns", color: "#be123c" },
-  { name: "Misc", slug: "misc", color: "#64748b" },
+  { name: "Inventory", slug: "inventory", color: "#2563eb", excludeFromReconciliation: false },
+  {
+    name: "Warehouse Rent",
+    slug: "warehouse-rent",
+    color: "#7c3aed",
+    excludeFromReconciliation: false,
+  },
+  { name: "Utilities", slug: "utilities", color: "#0891b2", excludeFromReconciliation: false },
+  { name: "Packaging", slug: "packaging", color: "#059669", excludeFromReconciliation: false },
+  { name: "Shipping", slug: "shipping", color: "#dc2626", excludeFromReconciliation: false },
+  { name: "Fuel", slug: "fuel", color: "#ea580c", excludeFromReconciliation: false },
+  { name: "Marketing", slug: "marketing", color: "#db2777", excludeFromReconciliation: false },
+  { name: "Equipment", slug: "equipment", color: "#475569", excludeFromReconciliation: false },
+  { name: "Repairs", slug: "repairs", color: "#ca8a04", excludeFromReconciliation: false },
+  { name: "Software", slug: "software", color: "#4f46e5", excludeFromReconciliation: false },
+  { name: "Office", slug: "office", color: "#0d9488", excludeFromReconciliation: false },
+  { name: "Food", slug: "food", color: "#16a34a", excludeFromReconciliation: false },
+  { name: "Returns", slug: "returns", color: "#be123c", excludeFromReconciliation: false },
+  { name: "Salary", slug: "salary", color: "#9333ea", excludeFromReconciliation: true },
+  { name: "Misc", slug: "misc", color: "#64748b", excludeFromReconciliation: false },
 ] as const;
 
 export const TIME_ZONE = "Europe/London";

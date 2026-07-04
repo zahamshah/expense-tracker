@@ -1,3 +1,4 @@
+import { SettlementButton } from "@/components/reconciliation/settlement-button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -9,11 +10,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatMoney, formatSignedMoney } from "@/lib/money";
-import type { ReconciliationRow, Settlement } from "@/lib/types";
+import type { ReconciliationCheckpointInfo, ReconciliationRow, Settlement } from "@/lib/types";
 
 type ReconciliationViewProps = {
   data: {
     totalExpensePence: number;
+    excludedExpensePence: number;
+    latestCheckpoint: ReconciliationCheckpointInfo;
     rows: ReconciliationRow[];
     settlements: Settlement[];
   };
@@ -23,12 +26,25 @@ export function ReconciliationView({ data }: ReconciliationViewProps) {
   return (
     <div className="grid gap-4 xl:grid-cols-[1.6fr_1fr]">
       <Card>
-        <CardHeader>
-          <CardTitle>Partner Contributions</CardTitle>
+        <CardHeader className="flex-row items-start justify-between gap-4">
+          <div>
+            <CardTitle>Partner Contributions</CardTitle>
+            {data.latestCheckpoint ? (
+              <p className="mt-2 text-sm text-muted-foreground">
+                Showing activity since {new Date(data.latestCheckpoint.settledAt).toLocaleString("en-GB")}.
+              </p>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">
+                Showing all reconcilable partner-paid expenses.
+              </p>
+            )}
+          </div>
+          <SettlementButton />
         </CardHeader>
         <CardContent>
-          <div className="mb-5 grid gap-3 sm:grid-cols-3">
-            <Metric label="Total expenses" value={formatMoney(data.totalExpensePence)} />
+          <div className="mb-5 grid gap-3 sm:grid-cols-4">
+            <Metric label="Reconciliation pool" value={formatMoney(data.totalExpensePence)} />
+            <Metric label="Excluded expenses" value={formatMoney(data.excludedExpensePence)} />
             <Metric label="Partners" value={String(data.rows.length)} />
             <Metric label="Settlement items" value={String(data.settlements.length)} />
           </div>

@@ -14,10 +14,14 @@ CREATE TABLE IF NOT EXISTS "Category" (
     "slug" TEXT NOT NULL,
     "color" TEXT NOT NULL,
     "sortOrder" INTEGER NOT NULL DEFAULT 0,
+    "excludeFromReconciliation" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
 );
+
+ALTER TABLE "Category"
+ADD COLUMN IF NOT EXISTS "excludeFromReconciliation" BOOLEAN NOT NULL DEFAULT false;
 
 CREATE TABLE IF NOT EXISTS "Expense" (
     "id" TEXT NOT NULL,
@@ -44,6 +48,15 @@ CREATE TABLE IF NOT EXISTS "Receipt" (
     CONSTRAINT "Receipt_pkey" PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS "ReconciliationCheckpoint" (
+    "id" TEXT NOT NULL,
+    "settledAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "settledTotalPence" INTEGER NOT NULL DEFAULT 0,
+    "note" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "ReconciliationCheckpoint_pkey" PRIMARY KEY ("id")
+);
+
 CREATE UNIQUE INDEX IF NOT EXISTS "Partner_name_key" ON "Partner"("name");
 CREATE UNIQUE INDEX IF NOT EXISTS "Category_name_key" ON "Category"("name");
 CREATE UNIQUE INDEX IF NOT EXISTS "Category_slug_key" ON "Category"("slug");
@@ -52,6 +65,7 @@ CREATE INDEX IF NOT EXISTS "Expense_categoryId_idx" ON "Expense"("categoryId");
 CREATE INDEX IF NOT EXISTS "Expense_paidById_idx" ON "Expense"("paidById");
 CREATE INDEX IF NOT EXISTS "Expense_createdAt_idx" ON "Expense"("createdAt");
 CREATE UNIQUE INDEX IF NOT EXISTS "Receipt_expenseId_key" ON "Receipt"("expenseId");
+CREATE INDEX IF NOT EXISTS "ReconciliationCheckpoint_settledAt_idx" ON "ReconciliationCheckpoint"("settledAt");
 
 DO $$
 BEGIN
@@ -117,24 +131,35 @@ WHERE "paidById" IN (SELECT "id" FROM "Partner" WHERE "name" = 'Partner C');
 
 DELETE FROM "Partner" WHERE "name" IN ('Partner A', 'Partner B', 'Partner C');
 
-INSERT INTO "Category" ("id", "name", "slug", "color", "sortOrder", "createdAt", "updatedAt")
+INSERT INTO "Category" (
+  "id",
+  "name",
+  "slug",
+  "color",
+  "sortOrder",
+  "excludeFromReconciliation",
+  "createdAt",
+  "updatedAt"
+)
 VALUES
-  ('cat_inventory', 'Inventory', 'inventory', '#2563eb', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('cat_warehouse_rent', 'Warehouse Rent', 'warehouse-rent', '#7c3aed', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('cat_utilities', 'Utilities', 'utilities', '#0891b2', 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('cat_packaging', 'Packaging', 'packaging', '#059669', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('cat_shipping', 'Shipping', 'shipping', '#dc2626', 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('cat_fuel', 'Fuel', 'fuel', '#ea580c', 6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('cat_marketing', 'Marketing', 'marketing', '#db2777', 7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('cat_equipment', 'Equipment', 'equipment', '#475569', 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('cat_repairs', 'Repairs', 'repairs', '#ca8a04', 9, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('cat_software', 'Software', 'software', '#4f46e5', 10, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('cat_office', 'Office', 'office', '#0d9488', 11, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('cat_food', 'Food', 'food', '#16a34a', 12, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('cat_returns', 'Returns', 'returns', '#be123c', 13, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('cat_misc', 'Misc', 'misc', '#64748b', 14, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+  ('cat_inventory', 'Inventory', 'inventory', '#2563eb', 1, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('cat_warehouse_rent', 'Warehouse Rent', 'warehouse-rent', '#7c3aed', 2, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('cat_utilities', 'Utilities', 'utilities', '#0891b2', 3, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('cat_packaging', 'Packaging', 'packaging', '#059669', 4, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('cat_shipping', 'Shipping', 'shipping', '#dc2626', 5, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('cat_fuel', 'Fuel', 'fuel', '#ea580c', 6, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('cat_marketing', 'Marketing', 'marketing', '#db2777', 7, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('cat_equipment', 'Equipment', 'equipment', '#475569', 8, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('cat_repairs', 'Repairs', 'repairs', '#ca8a04', 9, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('cat_software', 'Software', 'software', '#4f46e5', 10, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('cat_office', 'Office', 'office', '#0d9488', 11, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('cat_food', 'Food', 'food', '#16a34a', 12, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('cat_returns', 'Returns', 'returns', '#be123c', 13, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('cat_salary', 'Salary', 'salary', '#9333ea', 14, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('cat_misc', 'Misc', 'misc', '#64748b', 15, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT ("slug") DO UPDATE SET
   "name" = EXCLUDED."name",
   "color" = EXCLUDED."color",
   "sortOrder" = EXCLUDED."sortOrder",
+  "excludeFromReconciliation" = EXCLUDED."excludeFromReconciliation",
   "updatedAt" = CURRENT_TIMESTAMP;

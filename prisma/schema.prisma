@@ -18,14 +18,15 @@ model Partner {
 }
 
 model Category {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  slug      String    @unique
-  color     String
-  sortOrder Int       @default(0)
-  expenses  Expense[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id                        String    @id @default(cuid())
+  name                      String    @unique
+  slug                      String    @unique
+  color                     String
+  sortOrder                 Int       @default(0)
+  excludeFromReconciliation Boolean   @default(false)
+  expenses                  Expense[]
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
 }
 
 model Expense {
@@ -62,4 +63,14 @@ model Receipt {
   uploadedAt  DateTime @default(now())
 
   expense Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+}
+
+model ReconciliationCheckpoint {
+  id                String   @id @default(cuid())
+  settledAt         DateTime @default(now())
+  settledTotalPence Int      @default(0)
+  note              String?
+  createdAt         DateTime @default(now())
+
+  @@index([settledAt])
 }
