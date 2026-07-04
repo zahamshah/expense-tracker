@@ -2,7 +2,6 @@ export const PARTNERS = [
   { name: "aways", ownershipBps: 6000, sortOrder: 1, legacyNames: ["Partner A"] },
   { name: "zawar", ownershipBps: 2000, sortOrder: 2, legacyNames: ["Partner B"] },
   { name: "zaham", ownershipBps: 2000, sortOrder: 3, legacyNames: ["Partner C"] },
-  { name: "Business Account", ownershipBps: 0, sortOrder: 4, legacyNames: [] },
 ] as const;
 
 export const CATEGORIES = [

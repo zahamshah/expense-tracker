@@ -95,8 +95,7 @@ INSERT INTO "Partner" ("id", "name", "ownershipBps", "sortOrder", "createdAt", "
 VALUES
   ('partner_a', 'aways', 6000, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
   ('partner_b', 'zawar', 2000, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('partner_c', 'zaham', 2000, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  ('business_account', 'Business Account', 0, 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+  ('partner_c', 'zaham', 2000, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
 ON CONFLICT ("name") DO UPDATE SET
   "ownershipBps" = EXCLUDED."ownershipBps",
   "sortOrder" = EXCLUDED."sortOrder",
@@ -130,6 +129,12 @@ SET "paidById" = (SELECT "id" FROM "Partner" WHERE "name" = 'zaham' LIMIT 1)
 WHERE "paidById" IN (SELECT "id" FROM "Partner" WHERE "name" = 'Partner C');
 
 DELETE FROM "Partner" WHERE "name" IN ('Partner A', 'Partner B', 'Partner C');
+
+DELETE FROM "Partner" partner
+WHERE partner."name" = 'Business Account'
+  AND NOT EXISTS (
+    SELECT 1 FROM "Expense" expense WHERE expense."paidById" = partner."id"
+  );
 
 INSERT INTO "Category" (
   "id",

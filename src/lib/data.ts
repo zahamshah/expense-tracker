@@ -28,11 +28,6 @@ export async function getReconciliationData() {
   const latestCheckpoint = checkpoints[0] ?? null;
   const reconciliationWhere = {
     ...(latestCheckpoint ? { createdAt: { gt: latestCheckpoint.settledAt } } : {}),
-    paidBy: {
-      ownershipBps: {
-        gt: 0,
-      },
-    },
     category: {
       excludeFromReconciliation: false,
     },
@@ -61,18 +56,9 @@ export async function getReconciliationData() {
     prisma.expense.aggregate({
       where: {
         ...(latestCheckpoint ? { createdAt: { gt: latestCheckpoint.settledAt } } : {}),
-        OR: [
-          {
-            paidBy: {
-              ownershipBps: 0,
-            },
-          },
-          {
-            category: {
-              excludeFromReconciliation: true,
-            },
-          },
-        ],
+        category: {
+          excludeFromReconciliation: true,
+        },
       },
       _sum: {
         amountPence: true,

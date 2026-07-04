@@ -53,6 +53,8 @@ async function main() {
       });
     }
   }
+
+  await removeUnusedBusinessAccount();
 }
 
 async function ensurePartner(partner: (typeof PARTNERS)[number]) {
@@ -98,6 +100,24 @@ async function ensurePartner(partner: (typeof PARTNERS)[number]) {
       sortOrder: partner.sortOrder,
     },
   });
+}
+
+async function removeUnusedBusinessAccount() {
+  const businessAccount = await prisma.partner.findUnique({
+    where: { name: "Business Account" },
+  });
+
+  if (!businessAccount) return;
+
+  const expenseCount = await prisma.expense.count({
+    where: { paidById: businessAccount.id },
+  });
+
+  if (expenseCount === 0) {
+    await prisma.partner.delete({
+      where: { id: businessAccount.id },
+    });
+  }
 }
 
 main()

@@ -10,7 +10,7 @@ Production-ready internal expense tracker for a small WhatNot warehouse business
 - Search, filters, sorting, pagination, edit, and delete in the expense table.
 - Partner reconciliation for 60% / 20% / 20% ownership with net settlement suggestions.
 - Manual settlement checkpoints that reset reconciliation from the current moment.
-- Salary and Business Account expenses still appear in expenses/reporting but are excluded from reconciliation.
+- Salary expenses still appear in expenses/reporting but are excluded from reconciliation.
 - Server-generated CSV, Excel, and PDF exports.
 - Responsive UI with dark mode support.
 
@@ -72,7 +72,6 @@ The schema stores money as integer pence to avoid floating point errors. Payers 
 - aways: 60%
 - zawar: 20%
 - zaham: 20%
-- Business Account: 0%, excluded from reconciliation
 
 Categories are seeded from `src/lib/constants.ts`.
 

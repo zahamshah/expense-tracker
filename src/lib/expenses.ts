@@ -31,6 +31,11 @@ export async function getCategoryOptions(): Promise<CategoryOption[]> {
 
 export async function getPartnerOptions(): Promise<PartnerOption[]> {
   return prisma.partner.findMany({
+    where: {
+      ownershipBps: {
+        gt: 0,
+      },
+    },
     orderBy: { sortOrder: "asc" },
     select: {
       id: true,
