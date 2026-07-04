@@ -28,6 +28,7 @@ export async function uploadReceiptFile(file: File): Promise<UploadedReceipt> {
   const blob = await put(pathname, file, {
     access: "public",
     addRandomSuffix: false,
+    token: process.env.BLOB_READ_WRITE_TOKEN,
   });
 
   return {
@@ -44,6 +45,8 @@ export async function deleteReceiptBlob(pathname: string) {
     return false;
   }
 
-  await del(pathname);
+  await del(pathname, {
+    token: process.env.BLOB_READ_WRITE_TOKEN,
+  });
   return true;
 }
