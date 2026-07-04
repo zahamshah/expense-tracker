@@ -16,7 +16,8 @@ type ReconciliationViewProps = {
   data: {
     totalExpensePence: number;
     excludedExpensePence: number;
-    latestCheckpoint: ReconciliationCheckpointInfo;
+    latestCheckpoint: ReconciliationCheckpointInfo | null;
+    checkpoints: ReconciliationCheckpointInfo[];
     rows: ReconciliationRow[];
     settlements: Settlement[];
   };
@@ -24,8 +25,9 @@ type ReconciliationViewProps = {
 
 export function ReconciliationView({ data }: ReconciliationViewProps) {
   return (
-    <div className="grid gap-4 xl:grid-cols-[1.6fr_1fr]">
-      <Card>
+    <div className="space-y-4">
+      <div className="grid gap-4 xl:grid-cols-[1.6fr_1fr]">
+        <Card>
         <CardHeader className="flex-row items-start justify-between gap-4">
           <div>
             <CardTitle>Partner Contributions</CardTitle>
@@ -78,9 +80,9 @@ export function ReconciliationView({ data }: ReconciliationViewProps) {
             </TableBody>
           </Table>
         </CardContent>
-      </Card>
+        </Card>
 
-      <Card>
+        <Card>
         <CardHeader>
           <CardTitle>Net Settlement</CardTitle>
         </CardHeader>
@@ -103,6 +105,46 @@ export function ReconciliationView({ data }: ReconciliationViewProps) {
           ) : (
             <div className="flex h-40 items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground">
               Partners are currently balanced.
+            </div>
+          )}
+        </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Settlement History</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {data.checkpoints.length ? (
+            <div className="divide-y rounded-lg border">
+              {data.checkpoints.map((checkpoint) => (
+                <div
+                  key={checkpoint.id}
+                  className="grid gap-2 p-4 sm:grid-cols-[1fr_auto] sm:items-center"
+                >
+                  <div>
+                    <p className="font-medium">
+                      {new Date(checkpoint.settledAt).toLocaleString("en-GB")}
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {checkpoint.note ?? "Balances manually settled."}
+                    </p>
+                  </div>
+                  <div className="text-left sm:text-right">
+                    <p className="text-xs font-medium uppercase text-muted-foreground">
+                      Cleared pool
+                    </p>
+                    <p className="mt-1 font-semibold">
+                      {formatMoney(checkpoint.settledTotalPence)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex h-28 items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground">
+              No settlement checkpoints yet.
             </div>
           )}
         </CardContent>

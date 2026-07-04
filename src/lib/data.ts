@@ -21,9 +21,11 @@ export async function getDashboardData() {
 }
 
 export async function getReconciliationData() {
-  const latestCheckpoint = await prisma.reconciliationCheckpoint.findFirst({
+  const checkpoints = await prisma.reconciliationCheckpoint.findMany({
     orderBy: { settledAt: "desc" },
+    take: 8,
   });
+  const latestCheckpoint = checkpoints[0] ?? null;
   const reconciliationWhere = {
     ...(latestCheckpoint ? { createdAt: { gt: latestCheckpoint.settledAt } } : {}),
     paidBy: {
@@ -103,6 +105,12 @@ export async function getReconciliationData() {
           note: latestCheckpoint.note,
         }
       : null,
+    checkpoints: checkpoints.map((checkpoint) => ({
+      id: checkpoint.id,
+      settledAt: checkpoint.settledAt.toISOString(),
+      settledTotalPence: checkpoint.settledTotalPence,
+      note: checkpoint.note,
+    })),
     ...calculateReconciliation(partnerInputs, totalExpensePence),
   };
 }

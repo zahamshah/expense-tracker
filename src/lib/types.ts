@@ -93,4 +93,4 @@ export type ReconciliationCheckpointInfo = {
   settledAt: string;
   settledTotalPence: number;
   note: string | null;
-} | null;
+};
